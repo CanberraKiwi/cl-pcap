@@ -22,7 +22,7 @@
 ;; Constants to determine the pcap header/record byte ordering. 
 (defconstant pcap-magic
   '((#xa1b2c3d4 :big-endian :micro)
-    (#xd4d3b2a1 :little-endian :micro)
+    (#xd4c3b2a1 :little-endian :micro)
     (#xa1b23c4d :big-endian :nano)
     (#x4d3cb2a1 :little-endian :nano)))
 
@@ -87,7 +87,8 @@
 ;; structures - ETHERNET
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (def-pcap-struct ethernet
-    ((mac-src (uint8 :size 6))
+    ((preamble (uint8 :size 8))
+     (mac-src (uint8 :size 6))
      (mac-dst (uint8 :size 6))
      vlan-tag
      ethertype)
@@ -129,7 +130,7 @@
   "Open a pcap file for input"
   (let* ((file-handle (open file :direction :input
 			    :element-type 'uint8
-			    :if-does-not-exists :error))
+			    :if-does-not-exist :error))
 
 	 ;; Determine endian order of headers by an initial read as big-endian
 	 (magic (or (assoc (read-value 'uint32 file-handle :octet-order :big-endian)

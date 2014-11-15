@@ -97,7 +97,7 @@
   (:documentation "Report current stream position or move to a new position")
 
   (:method ((stream stream) &optional delta)
-    (file-position delta))
+    (file-position stream delta))
 
   (:method ((stream octet-array-stream) &optional delta)
     (with-slots (start) stream
@@ -119,7 +119,8 @@ uses a displaced array to reduce allocation overhead.")
 	(typecase stream
 	  (stream 
 	   (let ((buffer (make-array size :element-type 'uint8)))
-	     (read-n-octets stream buffer 0 size)))
+	     (read-n-octets stream buffer 0 size)
+	     buffer))
 
 	  (octet-array-stream
 	   (with-slots (source start) stream
@@ -140,7 +141,7 @@ uses a displaced array to reduce allocation overhead.")
 
 
   (:method ((type (eql 'uint32)) stream &key (octet-order *octet-order*))
-    (if (eq octet-order :little-endian)
+        (if (eq octet-order :little-endian)
 
 	(logior (read-octet stream)
 		(ash (read-octet stream) 8)
